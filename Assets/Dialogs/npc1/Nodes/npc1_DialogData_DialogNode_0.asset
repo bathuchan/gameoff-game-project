@@ -13,11 +13,16 @@ MonoBehaviour:
   m_Name: npc1_DialogData_DialogNode_0
   m_EditorClassIdentifier: 
   nodeID: 0
-  npcText: 
+  npcTextSegments: []
   isMonologue: 0
   nextNodeID: 0
   typingSpeed: 0.05
   choices: []
   showDetails: 0
   showChoices: 0
+  showTexts: 0
   willEndConversation: 0
+  useFixedFont: 0
+  fixedFontAsset: {fileID: 0}
+  useFixedColor: 0
+  fixedColor: {r: 0, g: 0, b: 0, a: 1}
