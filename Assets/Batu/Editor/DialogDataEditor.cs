@@ -37,6 +37,7 @@ public class DialogDataEditor : Editor
             // Create the asset for the new node in the Nodes folder
             string nodeAssetPath = Path.Combine(nodesFolderPath, $"{dialogData.name}_DialogNode_{newNode.nodeID}.asset");
             AssetDatabase.CreateAsset(newNode, nodeAssetPath.Replace("\\", "/")); // Replace backslashes for cross-platform compatibility
+            EditorUtility.SetDirty(newNode);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
         }
@@ -130,6 +131,7 @@ public class DialogDataEditor : Editor
                                 if (GUILayout.Button("Delete Text Segment: " + currentTextSegment.segmentId))
                                 {
                                     node.RemoveTextSegment(currentTextSegment);
+                                    EditorUtility.SetDirty(currentTextSegment);
                                     AssetDatabase.DeleteAsset(AssetDatabase.GetAssetPath(currentTextSegment)); // Deletion of a Node
                                     AssetDatabase.Refresh();
                                 }
@@ -181,6 +183,7 @@ public class DialogDataEditor : Editor
                         if (GUILayout.Button("Add Choice"))
                         {
                             node.AddChoice(new Choice());
+                            EditorUtility.SetDirty(dialogData);
                         }
 
                         for (int k = 0; k < node.choices.Count; k++)
@@ -193,6 +196,11 @@ public class DialogDataEditor : Editor
                             if (GUILayout.Button("Delete Choice"))
                             {
                                 node.RemoveChoice(node.choices[k]);
+                                EditorUtility.SetDirty(dialogData); // Ensure the main dialogData object is marked dirty
+                                EditorUtility.SetDirty(node);
+                                EditorUtility.SetDirty(target);
+
+                                AssetDatabase.SaveAssets(); // Force save to disk
                             }
                             EditorGUILayout.EndVertical();
                         }
@@ -206,6 +214,10 @@ public class DialogDataEditor : Editor
                     node.RemoveAllTextSegments();
                     dialogData.RemoveDialogNode(node);
                     AssetDatabase.DeleteAsset(AssetDatabase.GetAssetPath(node)); // Deletion of a Node
+                    EditorUtility.SetDirty(dialogData); // Ensure the main dialogData object is marked dirty
+                    EditorUtility.SetDirty(target);
+
+                    AssetDatabase.SaveAssets(); // Force save to disk
                     AssetDatabase.Refresh();
                 }
 
@@ -216,7 +228,10 @@ public class DialogDataEditor : Editor
             // Mark the target as dirty if any changes are made
             if (GUI.changed)
             {
+                EditorUtility.SetDirty(dialogData); // Ensure the main dialogData object is marked dirty
                 EditorUtility.SetDirty(target);
+                
+                AssetDatabase.SaveAssets(); // Force save to disk
             }
         }
         EditorGUI.EndDisabledGroup();
