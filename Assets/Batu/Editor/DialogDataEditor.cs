@@ -11,11 +11,16 @@ public class DialogDataEditor : Editor
     private void OnEnable()
     {
         dialogDataSerialized = new SerializedObject(target);
+        AssetDatabase.Refresh();
+    }
+
+    private void OnDisable()
+    {
+        AssetDatabase.SaveAssets();
     }
 
     public override void OnInspectorGUI()
     {
-        
         dialogDataSerialized.Update();
         DialogData dialogData = (DialogData)target;
 
@@ -38,7 +43,7 @@ public class DialogDataEditor : Editor
         EditorGUILayout.EndVertical();
         EditorGUI.EndDisabledGroup();
 
-        // Apply all changes at once
+        // Apply changes
         if (dialogDataSerialized.ApplyModifiedProperties())
         {
             MarkDirty(dialogData);
@@ -71,13 +76,10 @@ public class DialogDataEditor : Editor
 
         node.showDetails = EditorGUILayout.Foldout(node.showDetails, "Dialog Node: " + node.nodeID);
 
-
         if (node.showDetails)
         {
             DrawNodeDetails(node);
-
             DrawTextSegments(node);
-            
             DrawChoices(node, dialogData);
         }
 
@@ -87,20 +89,21 @@ public class DialogDataEditor : Editor
         }
 
         EditorGUILayout.EndVertical();
+        MarkDirty(node);
     }
 
     private void DrawNodeDetails(DialogNode node)
     {
         EditorGUILayout.BeginVertical("box");
         EditorGUILayout.LabelField("Node ID: " + node.nodeID);
-        if(node.showSettings = EditorGUILayout.Foldout(node.showSettings, "Node Settings"))
+
+        if (node.showSettings = EditorGUILayout.Foldout(node.showSettings, "Node Settings"))
         {
             DrawNodeSettings(node);
             node.typingSpeed = EditorGUILayout.Slider("Type Effect Duration", node.typingSpeed, 0.01f, 1f);
             EditorGUILayout.HelpBox("Type effect works faster if the value is lower", MessageType.Info);
         }
         EditorGUILayout.EndVertical();
-
     }
 
     private void DrawTextSegments(DialogNode node)
@@ -124,6 +127,7 @@ public class DialogDataEditor : Editor
             AssetDatabase.CreateAsset(newSegment, segmentAssetPath.Replace("\\", "/"));
             MarkDirty(newSegment, node);
         }
+
         if (node.npcTextSegments.Count != 0)
         {
             if (node.showTexts = EditorGUILayout.Foldout(node.showTexts, "NPC Text Segments"))
@@ -137,46 +141,38 @@ public class DialogDataEditor : Editor
 
                     if (currentTextSegment.showDetails = EditorGUILayout.Foldout(currentTextSegment.showDetails, "Customize Text:"))
                     {
-                        if (!node.useFixedColor) 
+                        if (!node.useFixedColor)
                         {
                             currentTextSegment.color = EditorGUILayout.ColorField("Text Color: ", currentTextSegment.color);
                         }
-                        else 
+                        else
                         {
                             EditorGUI.BeginDisabledGroup(node.useFixedColor);
                             EditorGUILayout.LabelField("Fixed Color is ON");
                             EditorGUI.EndDisabledGroup();
                         }
-                        
 
                         currentTextSegment.bold = EditorGUILayout.Toggle("Bold", currentTextSegment.bold);
                         currentTextSegment.italic = EditorGUILayout.Toggle("Italic", currentTextSegment.italic);
                         currentTextSegment.sizeMultiplier = EditorGUILayout.FloatField("Font Size Multiplier", currentTextSegment.sizeMultiplier);
 
-                        // Disable font selection if useFixedFont is true
                         EditorGUI.BeginDisabledGroup(node.useFixedFont);
                         currentTextSegment.font = (TMP_FontAsset)EditorGUILayout.ObjectField("Text Segment Font", currentTextSegment.font, typeof(TMP_FontAsset), false);
                         if (node.useFixedFont)
                             EditorGUILayout.LabelField("Fixed Font is ON");
                         EditorGUI.EndDisabledGroup();
-
                     }
 
                     if (GUILayout.Button("Delete Text Segment: " + currentTextSegment.segmentId))
                     {
-                        EditorUtility.SetDirty(currentTextSegment);
                         node.RemoveTextSegment(currentTextSegment);
-                        
-                        AssetDatabase.DeleteAsset(AssetDatabase.GetAssetPath(currentTextSegment)); // Deletion of a Node
-                        AssetDatabase.Refresh();
+                        AssetDatabase.DeleteAsset(AssetDatabase.GetAssetPath(currentTextSegment));
+                        MarkDirty(node);
                     }
                     EditorGUILayout.EndVertical();
                 }
             }
         }
-        EditorGUILayout.EndVertical();
-        EditorGUILayout.BeginVertical("box");
-        
     }
 
     private void DrawNodeSettings(DialogNode node)
@@ -184,19 +180,19 @@ public class DialogDataEditor : Editor
         EditorGUILayout.BeginVertical("box");
         node.isMonologue = EditorGUILayout.Toggle("Is Monologue", node.isMonologue);
 
-        if (node.isMonologue == true)
+        if (node.isMonologue)
         {
             node.nextNodeID = EditorGUILayout.IntField("Next Node ID", node.nextNodeID);
-            EditorGUI.BeginDisabledGroup(true);
-            EditorGUILayout.LabelField("Choices (Disabled for Monologues)");
-            EditorGUI.EndDisabledGroup();
+            EditorGUILayout.HelpBox("Choices Disabled for Monologues", MessageType.Info);
             node.willEndConversation = EditorGUILayout.Toggle("This will end the conversation:", node.willEndConversation);
         }
-        else if (node.isMonologue == false && node.choices.Count == 0)
+        else if (!node.isMonologue && node.choices.Count == 0)
         {
-            EditorGUILayout.HelpBox("You Didn't add any choice this way game will softlock itself", MessageType.Warning);
+            EditorGUILayout.HelpBox("No choices added, this will create a soft lock.", MessageType.Warning);
         }
+
         EditorGUILayout.EndVertical();
+
         node.useFixedFont = EditorGUILayout.Toggle("Use Fixed Font", node.useFixedFont);
         node.useFixedColor = EditorGUILayout.Toggle("Use Fixed Font Color", node.useFixedColor);
 
@@ -209,11 +205,13 @@ public class DialogDataEditor : Editor
         {
             node.fixedColor = EditorGUILayout.ColorField("Fixed Text Color: ", node.fixedColor);
         }
+
+        MarkDirty(node);
     }
 
     private void DrawChoices(DialogNode node, DialogData dialogData)
     {
-        if (!node.isMonologue) 
+        if (!node.isMonologue)
         {
             if (GUILayout.Button("Add Choice"))
             {
@@ -221,14 +219,13 @@ public class DialogDataEditor : Editor
                 MarkDirty(dialogData);
             }
 
-            EditorGUILayout.BeginVertical("box");
-            if (node.showChoices=EditorGUILayout.Foldout(node.showChoices,"Choices"+"("+node.choices.Count+")")) 
+            if (node.showChoices = EditorGUILayout.Foldout(node.showChoices, $"Choices ({node.choices.Count})"))
             {
                 for (int i = 0; i < node.choices.Count; i++)
                 {
                     Choice choice = node.choices[i];
                     EditorGUILayout.BeginVertical("box");
-                    EditorGUILayout.LabelField((i + 1) + ". Choices");
+                    EditorGUILayout.LabelField($"{i + 1}. Choice");
                     choice.choiceText = EditorGUILayout.TextField("Choice Text", choice.choiceText);
                     choice.typingSpeed = EditorGUILayout.Slider("Type Effect Speed", choice.typingSpeed, 0.01f, 1f);
                     choice.nextNodeID = EditorGUILayout.IntField("Next Node ID", choice.nextNodeID);
@@ -241,18 +238,7 @@ public class DialogDataEditor : Editor
                     EditorGUILayout.EndVertical();
                 }
             }
-            EditorGUILayout.EndVertical();
-
-
         }
-        else 
-        {
-            EditorGUI.BeginDisabledGroup(true);
-            EditorGUILayout.LabelField("Choices (Disabled for Monologues)");
-            EditorGUI.EndDisabledGroup();
-        }
-       
-        //EditorGUI.EndDisabledGroup();
     }
 
     private void DeleteNodeAsset(DialogNode node, DialogData dialogData)
@@ -267,8 +253,11 @@ public class DialogDataEditor : Editor
     {
         foreach (var obj in objs)
         {
-            EditorUtility.SetDirty(obj);
+            if (obj != null)
+                EditorUtility.SetDirty(obj);
         }
-        AssetDatabase.SaveAssets();
+        //AssetDatabase.Refresh();
+        
     }
+    
 }
