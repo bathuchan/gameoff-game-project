@@ -1,6 +1,6 @@
-using System;
+
 using System.Collections.Generic;
-using System.IO;
+
 using TMPro;
 using UnityEditor;
 using UnityEngine;
@@ -16,6 +16,7 @@ public class DialogNode : ScriptableObject
     public float typingSpeed = 0.05f;
     public List<Choice> choices;     // Choices available at this node
     [HideInInspector] public bool showDetails = false;
+    [HideInInspector] public bool showSettings = true;
     [HideInInspector] public bool showChoices=false;
     [HideInInspector] public bool showTexts = false;
     public bool willEndConversation = false;

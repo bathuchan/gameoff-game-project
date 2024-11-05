@@ -15,8 +15,8 @@ public class DialogSystem : MonoBehaviour
 
     private DialogNode currentNode;
     private Coroutine typingCoroutine;
-    private bool isTyping;
-    private bool isDisplayingChoices;
+    //private bool isTyping;
+    //private bool isDisplayingChoices;
 
     private void Start()
     {
@@ -44,7 +44,7 @@ public class DialogSystem : MonoBehaviour
             StopCoroutine(typingCoroutine);
         }
 
-        isTyping = true;
+        //isTyping = true;
         typingCoroutine = StartCoroutine(TypeText(node.npcTextSegments, node.typingSpeed));
     }
 
@@ -80,7 +80,7 @@ public class DialogSystem : MonoBehaviour
             }
         }
 
-        isTyping = false;
+        //isTyping = false;
         UpdateChoicesUI(currentNode);
     }
 
@@ -192,7 +192,7 @@ public class DialogSystem : MonoBehaviour
         {
             nextButton.gameObject.SetActive(true);
             choicesContainer.gameObject.SetActive(true);
-            isDisplayingChoices = true;
+            //isDisplayingChoices = true;
 
             // Start coroutine to display choices but disable interaction until all choices are shown
             StartCoroutine(DisplayAllChoicesSequentially(node));
@@ -226,7 +226,7 @@ public class DialogSystem : MonoBehaviour
         }
 
         nextButton.gameObject.SetActive(false);
-        isDisplayingChoices = false;
+        //isDisplayingChoices = false;
     }
 
     private IEnumerator TypeChoiceText(string choiceText, TextMeshProUGUI choiceTextUI, GameObject buttonGameObject, float typingSpeed)
@@ -258,7 +258,7 @@ public class DialogSystem : MonoBehaviour
         }
 
         nextButton.gameObject.SetActive(false);
-        isDisplayingChoices = false;
+        //isDisplayingChoices = false;
     }
 
     private void OnChoiceSelected(Choice choice)
