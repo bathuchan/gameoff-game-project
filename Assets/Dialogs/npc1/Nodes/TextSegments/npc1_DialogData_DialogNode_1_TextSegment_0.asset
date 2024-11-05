@@ -9,9 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 06544c6dd36f0c44eac415d7fa71ea48, type: 3}
-  m_Name: npc1_DialogData
+  m_Script: {fileID: 11500000, guid: 4c65f28e658b98a4585b0bb9e7bd6a09, type: 3}
+  m_Name: npc1_DialogData_DialogNode_1_TextSegment_0
   m_EditorClassIdentifier: 
-  dialogNodes:
-  - {fileID: 11400000, guid: 43b93f31a7e928b44ab9c7057bf4b117, type: 2}
-  - {fileID: 11400000, guid: 52afd66494d3b8d43a6b99c02f9c17af, type: 2}
+  segmentId: 0
+  text: deneme
+  color: {r: 0, g: 0, b: 0, a: 1}
+  bold: 0
+  italic: 0
+  sizeMultiplier: 2
+  font: {fileID: 0}
+  showDetails: 1

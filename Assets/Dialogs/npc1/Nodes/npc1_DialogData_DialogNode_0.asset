@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df1d9bef0b17bd142ab6b820cc12c79a, type: 3}
+  m_Name: npc1_DialogData_DialogNode_0
+  m_EditorClassIdentifier: 
+  nodeID: 0
+  npcTextSegments:
+  - {fileID: 11400000, guid: 77688591f68a53f4fbd72820c9bf7c18, type: 2}
+  - {fileID: 11400000, guid: ebf5a2fc0333f044da46818ed2a516e3, type: 2}
+  isMonologue: 1
+  nextNodeID: 1
+  typingSpeed: 1
+  choices: []
+  showDetails: 1
+  showSettings: 1
+  showChoices: 0
+  showTexts: 1
+  willEndConversation: 0
+  useFixedFont: 0
+  fixedFontAsset: {fileID: 0}
+  useFixedColor: 0
+  fixedColor: {r: 0, g: 0, b: 0, a: 1}
