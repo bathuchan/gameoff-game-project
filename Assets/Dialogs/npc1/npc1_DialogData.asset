@@ -15,3 +15,5 @@ MonoBehaviour:
   dialogNodes:
   - {fileID: 11400000, guid: 43b93f31a7e928b44ab9c7057bf4b117, type: 2}
   - {fileID: 11400000, guid: 52afd66494d3b8d43a6b99c02f9c17af, type: 2}
+  - {fileID: 11400000, guid: c07bfb912fc58424483584c5e82d3718, type: 2}
+  - {fileID: 11400000, guid: a430aa87c48aa7d448044142b64316df, type: 2}

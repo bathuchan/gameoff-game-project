@@ -10,22 +10,21 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: df1d9bef0b17bd142ab6b820cc12c79a, type: 3}
-  m_Name: npc1_DialogData_DialogNode_0
+  m_Name: npc1_DialogData_DialogNode_3
   m_EditorClassIdentifier: 
-  nodeID: 0
+  nodeID: 3
   npcTextSegments:
-  - {fileID: 11400000, guid: 77688591f68a53f4fbd72820c9bf7c18, type: 2}
-  - {fileID: 11400000, guid: ebf5a2fc0333f044da46818ed2a516e3, type: 2}
-  - {fileID: 11400000, guid: 30e93b327a9682d468f5945184389239, type: 2}
+  - {fileID: 11400000, guid: c497e5b94746ce6409854f588868f2e9, type: 2}
+  - {fileID: 11400000, guid: a5c30940ebda39e41b8e04f3e5b90301, type: 2}
   isMonologue: 1
-  nextNodeID: 1
+  nextNodeID: 0
   typingSpeed: 0.05
   choices: []
-  showDetails: 1
+  showDetails: 0
   showSettings: 1
   showChoices: 0
-  showTexts: 1
-  willEndConversation: 0
+  showTexts: 0
+  willEndConversation: 1
   useFixedFont: 0
   fixedFontAsset: {fileID: 0}
   useFixedColor: 0

@@ -163,7 +163,7 @@ public class PlayerInputController : MonoBehaviour
 
     private void Awake()
     {
-        Cursor.lockState = CursorLockMode.Locked;
+        //Cursor.lockState = CursorLockMode.Locked;
         
         targetFOV = normalFOV;
         mainCamera.m_Lens.FieldOfView = normalFOV;
@@ -185,7 +185,7 @@ public class PlayerInputController : MonoBehaviour
 
     private void Start()
     {
-        Cursor.lockState = CursorLockMode.Locked;
+        
         Cursor.visible = false;
         // Get the CapsuleCollider component
         capsuleCollider = GetComponentInChildren<CapsuleCollider>();
@@ -402,6 +402,7 @@ public class PlayerInputController : MonoBehaviour
         {
             StartCoroutine(VibrateController(.5f, 0, .2f));
         }
+        _rb.velocity = new Vector3(_rb.velocity.x, 0, _rb.velocity.z);
         _rb.AddForce(Vector3.up * _jumpForce, ForceMode.Impulse);
 
         
@@ -446,7 +447,7 @@ public class PlayerInputController : MonoBehaviour
             //    airTime += Time.deltaTime;
             //    airSpeedMultiplier = Mathf.Min(airSpeedMultiplier + airTime * airTimeIncrement, maxAirSpeedMultiplier);
             //}
-            
+            Debug.Log("in air");
 
             yield return new WaitForSeconds(0.1f);
 
@@ -475,9 +476,9 @@ public class PlayerInputController : MonoBehaviour
             if (IsGrounded()) {
                 
                 wasGrounded = true;
-                inAir = false; }
+                inAir = false; 
+            }
             
-
         }
 
         //if (!wallrunScript.isWallrunning&&wallrunScript.tiltCoroutine == null)
@@ -538,6 +539,7 @@ public class PlayerInputController : MonoBehaviour
 
         if (moveDir.magnitude > _lookTreshold)
         {
+            if(_rb.isKinematic) _rb.isKinematic = false;
             isWalking = true;
 
             Vector3 forward = mainCamera.transform.forward;
@@ -605,9 +607,13 @@ public class PlayerInputController : MonoBehaviour
             //if (waitCoroutine == null) StartCoroutine(WaitFor(2f, w8));
 
 
-            if (/*!wallrunScript.isWallrunning &&*/ airCoroutine == null&&!onSlope /*&& w8*/ /*&& (_rb.velocity.magnitude >= vel.magnitude)*/)
+            if (/*!wallrunScript.isWallrunning &&*/ airCoroutine == null && !onSlope/*&& w8*/ /*&& (_rb.velocity.magnitude >= vel.magnitude)*/)
             {
                 _rb.velocity = new Vector3(0, _rb.velocity.y, 0);
+            }else if(airCoroutine == null && onSlope&&!_rb.isKinematic) 
+            {
+                _rb.velocity = new Vector3(0, 0, 0);
+                //_rb.isKinematic = true;
             }
 
         }
@@ -906,7 +912,8 @@ public class PlayerInputController : MonoBehaviour
             _rb.drag = 1f;
             jumpRaycastLenght = 1.02f * transform.localScale.y;
             _jumpForce=_jumpForceOnSlope;
-            _rb.AddForce(-slopeHit.normal * 4f, ForceMode.Force);
+            //_rb.AddForce(-slopeHit.normal * 1f, ForceMode.Force);
+            //Debug.Log("ziplayinca buradayiz");
         }
         else 
         {

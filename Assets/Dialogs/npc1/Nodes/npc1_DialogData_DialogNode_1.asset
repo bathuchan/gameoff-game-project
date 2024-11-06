@@ -15,20 +15,44 @@ MonoBehaviour:
   nodeID: 1
   npcTextSegments:
   - {fileID: 11400000, guid: 6c6bcb2156ed9724fa290848dccf109c, type: 2}
+  - {fileID: 11400000, guid: 0f4f728ec2891774bb6bcec2b7537d16, type: 2}
+  - {fileID: 11400000, guid: 8b01f543bf4495741809b7ed3151b1b6, type: 2}
   isMonologue: 0
   nextNodeID: 0
   typingSpeed: 0.05
   choices:
-  - choiceText: 1
+  - choiceText: "Ne diyorsun be anlamad\u0131m. Tekrar s\xF6yle ne diyorsan."
     nextNodeID: 0
     typingSpeed: 0.05
-  - choiceText: 2
+  - choiceText: "Tabii ki yan\u0131mda her zaman bal ta\u015F\u0131r\u0131m. Buyur
+      :)"
+    nextNodeID: 2
+    typingSpeed: 0.05
+  - choiceText: "Maalesef sabah hepsini Ay\u0131 Yogi yedi."
+    nextNodeID: 3
+    typingSpeed: 0.05
+  - choiceText: a
     nextNodeID: 0
     typingSpeed: 0.05
-  showDetails: 1
+  - choiceText: b
+    nextNodeID: 0
+    typingSpeed: 0.05
+  - choiceText: c
+    nextNodeID: 0
+    typingSpeed: 0.05
+  - choiceText: d
+    nextNodeID: 0
+    typingSpeed: 0.05
+  - choiceText: e
+    nextNodeID: 0
+    typingSpeed: 0.05
+  - choiceText: f
+    nextNodeID: 0
+    typingSpeed: 0.05
+  showDetails: 0
   showSettings: 1
-  showChoices: 1
-  showTexts: 1
+  showChoices: 0
+  showTexts: 0
   willEndConversation: 0
   useFixedFont: 0
   fixedFontAsset: {fileID: 0}

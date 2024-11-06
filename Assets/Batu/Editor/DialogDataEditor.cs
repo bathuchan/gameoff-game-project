@@ -161,6 +161,7 @@ public class DialogDataEditor : Editor
                         if (node.useFixedFont)
                             EditorGUILayout.LabelField("Fixed Font is ON");
                         EditorGUI.EndDisabledGroup();
+                        currentTextSegment.animateSegment = EditorGUILayout.Toggle("Animate", currentTextSegment.animateSegment);
                     }
 
                     if (GUILayout.Button("Delete Text Segment: " + currentTextSegment.segmentId))

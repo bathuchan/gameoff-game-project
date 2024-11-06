@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: npc1_DialogData_DialogNode_0_TextSegment_1
   m_EditorClassIdentifier: 
   segmentId: 1
-  text: ' ilayda'
-  color: {r: 0.96981126, g: 0.05672476, b: 0.05672476, a: 1}
+  text: " Ben \xE7ok uzaklardan gelen bir uzayl\u0131y\u0131m ve can\u0131m bal \xE7ekiyor."
+  color: {r: 0, g: 0, b: 0, a: 1}
   bold: 0
-  italic: 1
+  italic: 0
   sizeMultiplier: 1
   font: {fileID: 0}
-  showDetails: 1
+  showDetails: 0

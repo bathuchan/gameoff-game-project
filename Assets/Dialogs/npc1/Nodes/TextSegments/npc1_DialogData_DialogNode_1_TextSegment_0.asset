@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: npc1_DialogData_DialogNode_1_TextSegment_0
   m_EditorClassIdentifier: 
   segmentId: 0
-  text: deneme
+  text: "Bana verebilece\u011Fin "
   color: {r: 0, g: 0, b: 0, a: 1}
   bold: 0
   italic: 0
-  sizeMultiplier: 2
+  sizeMultiplier: 1
   font: {fileID: 0}
-  showDetails: 1
+  showDetails: 0

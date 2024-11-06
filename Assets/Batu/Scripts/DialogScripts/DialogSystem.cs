@@ -15,16 +15,24 @@ public class DialogSystem : MonoBehaviour
 
     private DialogNode currentNode;
     private Coroutine typingCoroutine;
-    //private bool isTyping;
-    //private bool isDisplayingChoices;
+    private Coroutine choicesCoroutine;
+    private bool isTyping = false;
+    private bool isDisplayingChoices = false;
+    [SerializeField] private PlayerInputController playerInput;
 
     private void Start()
     {
-        StartDialog(0);
+        if (playerInput == null) playerInput = GameObject.FindAnyObjectByType<PlayerInputController>();
+
+        nextButton.onClick.AddListener(OnSkipOrAdvance); // Attach the skip/advance logic to the button
+        //StartDialog(0);
     }
 
     public void StartDialog(int startNodeID)
     {
+        playerInput.enabled = false;
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
         dialogUI.SetActive(true);
         currentNode = FindNodeByID(startNodeID);
         if (currentNode != null)
@@ -44,7 +52,6 @@ public class DialogSystem : MonoBehaviour
             StopCoroutine(typingCoroutine);
         }
 
-        //isTyping = true;
         typingCoroutine = StartCoroutine(TypeText(node.npcTextSegments, node.typingSpeed));
     }
 
@@ -53,21 +60,28 @@ public class DialogSystem : MonoBehaviour
         npcTextUI.text = ""; // Clear the text field
         nextButton.gameObject.SetActive(true);
         nextButton.onClick.RemoveAllListeners();
+        nextButton.onClick.AddListener(OnSkipOrAdvance);
+
+        isTyping = true;
 
         foreach (var segment in textSegments)
         {
-            // Get the formatted text for the current segment
             string formattedText = ApplyFormatting(segment);
 
             int i = 0;
             while (i < formattedText.Length)
             {
+                if (!isTyping) // Stop typing if the skip button was pressed to show full text
+                {
+                    npcTextUI.text = BuildFullText(textSegments);
+                    break;
+                }
+
                 if (formattedText[i] == '<')
                 {
                     int closingBracketIndex = formattedText.IndexOf('>', i);
                     if (closingBracketIndex != -1)
                     {
-                        // Append the entire tag immediately
                         npcTextUI.text += formattedText.Substring(i, closingBracketIndex - i + 1);
                         i = closingBracketIndex + 1;
                         continue;
@@ -78,41 +92,74 @@ public class DialogSystem : MonoBehaviour
                 i++;
                 yield return new WaitForSeconds(typingSpeed);
             }
+
+            if (!isTyping) break; // Exit typing early if the skip button was pressed
         }
 
-        //isTyping = false;
+        isTyping = false;
         UpdateChoicesUI(currentNode);
     }
 
-    // Method to apply formatting based on TextSegment properties
+    private void OnSkipOrAdvance()
+    {
+        if (isTyping)
+        {
+            isTyping = false; // Stop typing to show the full text instantly
+        }
+        else if (isDisplayingChoices)
+        {
+            if (choicesCoroutine != null) // Stop the choices coroutine if it's running
+            {
+                StopCoroutine(choicesCoroutine);
+            }
+            ShowAllChoicesInstantly(currentNode); // Show all choices if choices are being typed
+            isDisplayingChoices = false;
+        }
+        else
+        {
+            if (currentNode.willEndConversation)
+            {
+                EndDialog();
+            }
+            else
+            {
+                StartDialog(currentNode.nextNodeID); // Advance to the next dialog node
+            }
+        }
+    }
+
+    private void EndDialog()
+    {
+        dialogUI.SetActive(false);
+        playerInput.enabled = true;
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+    }
+
     private string ApplyFormatting(TextSegment segment)
     {
         string text = segment.text;
 
-        // Apply size multiplier if different from 1
         if (segment.sizeMultiplier != 1f)
         {
             text = $"<size={(int)(npcTextUI.fontSize * segment.sizeMultiplier)}>{text}</size>";
         }
 
-        // Apply color if specified
         Color color;
         string colorHex;
         if (currentNode.useFixedColor)
         {
             color = currentNode.fixedColor;
             colorHex = ColorUtility.ToHtmlStringRGB(color);
-
         }
         else
         {
             color = segment.color;
             colorHex = ColorUtility.ToHtmlStringRGB(color);
-
         }
 
         text = $"<color=#{colorHex}>{text}</color>";
-        // Apply bold and italic if true
+
         if (segment.bold)
         {
             text = $"<b>{text}</b>";
@@ -123,7 +170,6 @@ public class DialogSystem : MonoBehaviour
             text = $"<i>{text}</i>";
         }
 
-        // Apply font if a custom font is assigned
         if (currentNode.useFixedFont && currentNode.fixedFontAsset != null)
         {
             text = $"<font=\"{segment.font.name}\">{text}</font>";
@@ -139,34 +185,18 @@ public class DialogSystem : MonoBehaviour
         return text;
     }
 
-
-    // Helper function to build the full text from segments instantly
     private string BuildFullText(List<TextSegment> segments)
     {
         string fullText = "";
         foreach (var segment in segments)
         {
-            fullText += BuildRichText(segment);
+            fullText += ApplyFormatting(segment);
         }
         return fullText;
     }
 
-    // Helper function to wrap text in Rich Text tags
-    private string BuildRichText(TextSegment segment)
-    {
-        string styledText = segment.text;
-
-        if (segment.bold) styledText = "<b>" + styledText + "</b>";
-        if (segment.italic) styledText = "<i>" + styledText + "</i>";
-        styledText = $"<color=#{ColorUtility.ToHtmlStringRGB(segment.color)}>" + styledText + "</color>";
-        styledText = $"<size={(int)(npcTextUI.fontSize * segment.sizeMultiplier)}>" + styledText + "</size>";
-
-        return styledText;
-    }
-
     private void UpdateChoicesUI(DialogNode node)
     {
-        // Clear any existing choices before updating
         foreach (Transform child in choicesContainer)
         {
             Destroy(child.gameObject);
@@ -179,7 +209,7 @@ public class DialogSystem : MonoBehaviour
             {
                 if (node.willEndConversation)
                 {
-                    dialogUI.SetActive(false);
+                    EndDialog();
                 }
                 else
                 {
@@ -192,10 +222,8 @@ public class DialogSystem : MonoBehaviour
         {
             nextButton.gameObject.SetActive(true);
             choicesContainer.gameObject.SetActive(true);
-            //isDisplayingChoices = true;
-
-            // Start coroutine to display choices but disable interaction until all choices are shown
-            StartCoroutine(DisplayAllChoicesSequentially(node));
+            isDisplayingChoices = true;
+            choicesCoroutine = StartCoroutine(DisplayAllChoicesSequentially(node));
         }
     }
 
@@ -219,25 +247,12 @@ public class DialogSystem : MonoBehaviour
             yield return new WaitForSeconds(0.3f);
         }
 
-        // Enable choices after all are displayed
         foreach (Button choiceButton in choiceButtons)
         {
             choiceButton.interactable = true;
         }
 
         nextButton.gameObject.SetActive(false);
-        //isDisplayingChoices = false;
-    }
-
-    private IEnumerator TypeChoiceText(string choiceText, TextMeshProUGUI choiceTextUI, GameObject buttonGameObject, float typingSpeed)
-    {
-        buttonGameObject.SetActive(true);
-
-        foreach (char letter in choiceText)
-        {
-            choiceTextUI.text += letter;
-            yield return new WaitForSeconds(typingSpeed);
-        }
     }
 
     private void ShowAllChoicesInstantly(DialogNode node)
@@ -258,7 +273,23 @@ public class DialogSystem : MonoBehaviour
         }
 
         nextButton.gameObject.SetActive(false);
-        //isDisplayingChoices = false;
+    }
+
+    private IEnumerator TypeChoiceText(string choiceText, TextMeshProUGUI choiceTextUI, GameObject buttonGameObject, float typingSpeed)
+    {
+        buttonGameObject.SetActive(true);
+
+        foreach (char letter in choiceText)
+        {
+            if (!isDisplayingChoices) // Skip typing if all choices should be shown instantly
+            {
+                choiceTextUI.text = choiceText;
+                yield break;
+            }
+
+            choiceTextUI.text += letter;
+            yield return new WaitForSeconds(typingSpeed);
+        }
     }
 
     private void OnChoiceSelected(Choice choice)

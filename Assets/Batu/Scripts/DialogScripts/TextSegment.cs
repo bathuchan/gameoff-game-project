@@ -13,4 +13,5 @@ public class TextSegment : ScriptableObject
     public float sizeMultiplier = 1f; // Font size multiplier
     public TMP_FontAsset font; // Specific font for this segment
     [HideInInspector] public bool showDetails = false;
+    public bool animateSegment=false;
 }
